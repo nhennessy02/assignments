@@ -12,6 +12,7 @@
 
 #include <DirectXMath.h>
 #include <memory>
+#include <math.h>
 
 // Needed for a helper function to load pre-compiled shader files
 #pragma comment(lib, "d3dcompiler.lib")
@@ -195,37 +196,45 @@ void Game::CreateGeometry()
 	
 	Vertex mesh1vertices[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.4f, +0.0f), red },
-		{ XMFLOAT3(+0.4f, -0.4f, +0.0f), blue },
-		{ XMFLOAT3(-0.4f, -0.4f, +0.0f), green },
+		{ XMFLOAT3(+0.0f, +0.3f, +0.0f), red },
+		{ XMFLOAT3(+0.3f, -0.3f, +0.0f), blue },
+		{ XMFLOAT3(-0.3f, -0.3f, +0.0f), green },
 	};
 	unsigned int mesh1indices[] = { 0, 1, 2 };
 	triangle = std::make_shared<Mesh>(mesh1vertices,3,mesh1indices,3,"triangle");
 
 	entities.push_back(std::make_shared<GameEntity>(triangle));
 	entities.push_back(std::make_shared<GameEntity>(triangle));
-	entities[1]->GetTransform()->SetPosition(0.9,0.9,0.9); 
 
 	Vertex mesh2vertices[] =
 	{
-		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), magenta },
-		{ XMFLOAT3(+0.5f, +0.5f, +0.0f), cyan },
-		{ XMFLOAT3(+0.4f, +0.3f, +0.0f), yellow },
-		{ XMFLOAT3(+0.3f, +0.5f, +0.0f), black },
+		{ XMFLOAT3(+0.0f, +0.1f, +0.0f), magenta },
+		{ XMFLOAT3(+0.05f, +0.0f, +0.0f), cyan },
+		{ XMFLOAT3(+0.0f, -0.1f, +0.0f), yellow },
+		{ XMFLOAT3(-0.05f, +0.0f, +0.0f), black },
 	};
 	unsigned int mesh2indices[] = { 0, 1, 3, 1, 2, 3 };
 	diamond = std::make_shared<Mesh>(mesh2vertices, 4, mesh2indices, 6, "diamond");
 
+
+	entities.push_back(std::make_shared<GameEntity>(diamond));
+	entities.push_back(std::make_shared<GameEntity>(diamond));
+	entities[2]->GetTransform()->SetPosition(0.5, 0.6, 0.0);
+	entities[3]->GetTransform()->SetPosition(0.8, 0.6, 0.0);
+
 	Vertex mesh3vertices[] =
 	{
-		{ XMFLOAT3(+0.4f, +0.0f, +0.0f), red },
-		{ XMFLOAT3(+0.5f, -0.3f, +0.0f), yellow },
-		{ XMFLOAT3(+0.6f, +0.3f, +0.0f), red },
-		{ XMFLOAT3(+0.7f, -0.3f, +0.0f), yellow },
-		{ XMFLOAT3(+0.8f, +0.0f, +0.0f), red },
+		{ XMFLOAT3(-0.1f, +0.0f, +0.0f), red },
+		{ XMFLOAT3(-0.05f, -0.2f, +0.0f), yellow },
+		{ XMFLOAT3(+0.0f, +0.2f, +0.0f), red },
+		{ XMFLOAT3(+0.05f, -0.2f, +0.0f), yellow },
+		{ XMFLOAT3(+0.1f, +0.0f, +0.0f), red },
 	};
 	unsigned int mesh3indices[] = { 0, 2, 1, 2, 3, 1, 2, 4, 3 };
-	hexagon = std::make_shared<Mesh>(mesh3vertices, 5, mesh3indices, 9, "trapezoid");
+	hexagon = std::make_shared<Mesh>(mesh3vertices, 5, mesh3indices, 9, "hexagon");
+
+	entities.push_back(std::make_shared<GameEntity>(hexagon));
+	entities[4]->GetTransform()->SetPosition(0.6, -0.7, 0.0);
 
 }
 
@@ -246,8 +255,34 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	mover.x = mover.x + moveFactor * deltaTime;
+	mover.y = mover.y + moveFactor * deltaTime;
+	if (mover.x >= 1.0f)
+		moveFactor = -moveFactor;
+	else if (mover.x <= -1.0f)
+		moveFactor = -moveFactor;
+	entities[0]->GetTransform()->SetPosition(mover.x,0.0f,0.0f);
+	entities[1]->GetTransform()->SetPosition(0.0f, mover.y, 0.0f);
+
+
+	scaler.x = scaler.x + scaleFactor * deltaTime;
+	scaler.y = scaler.y + scaleFactor * deltaTime;
+	if (scaler.x >= 3.0f)
+		scaleFactor = -scaleFactor;
+	else if (scaler.x <= 0.0f)
+		scaleFactor = -scaleFactor;
+	entities[2]->GetTransform()->SetScale(scaler);
+	entities[3]->GetTransform()->SetScale(-scaler.x, -scaler.y, scaler.z);
+
+
+	rotator.z = rotator.z + rotateFactor * deltaTime;
+	if (rotator.z >= 6.28319f)
+		rotator.z = 0.0f;
+	entities[4]->GetTransform()->SetRotation(rotator);
+
 	ImGuiUpdate(deltaTime);
 	BuildUI(deltaTime);
+
 	// Example input checking: Quit if the escape key is pressed
 	if (Input::KeyDown(VK_ESCAPE))
 		Window::Quit();
@@ -324,7 +359,6 @@ void Game::BuildUI(float deltaTime)
 	if (ImGui::CollapsingHeader("Mesh Information"))
 	{
 		ImGui::ColorEdit4("Color Tint", colorTint);
-		ImGui::SliderFloat3("Mesh Position", offset, -1.0, 1.0);
 		if (ImGui::CollapsingHeader("Mesh: Triangle"))
 		{
 			ImGui::Text("Triangles: %i", triangle->GetIndexCount() / 3);
@@ -344,6 +378,11 @@ void Game::BuildUI(float deltaTime)
 			ImGui::Text("Indices: %i", hexagon->GetIndexCount());
 		}
 	}
+
+	if (ImGui::CollapsingHeader("Scene Entities")) 
+	{
+
+	}
 	ImGui::End();
 }
 
@@ -360,11 +399,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Clear the back buffer (erase what's on screen) and depth buffer
 		Graphics::Context->ClearRenderTargetView(Graphics::BackBufferRTV.Get(),	color);
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	}
-
-	//Constant Buffer Data & Mapping
-	{
-		
 	}
 
 	// DRAW geometry

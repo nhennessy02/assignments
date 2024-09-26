@@ -60,8 +60,16 @@ private:
 	std::shared_ptr<Mesh> diamond;
 	std::shared_ptr<Mesh> hexagon;
 
+	//entities
 	std::vector<std::shared_ptr<GameEntity>> entities;
 
+	//transform stuff
+	DirectX::XMFLOAT3 mover = { 0.0f, 0.0f, 0.0f };
+	float moveFactor = 0.25;
+	DirectX::XMFLOAT3 rotator = { 0.0f, 0.0f, 0.0f };
+	float rotateFactor = 1.0;
+	DirectX::XMFLOAT3 scaler = { 1.0f, 1.0f, 1.0f };
+	float scaleFactor = 0.6;
 	
 };
 

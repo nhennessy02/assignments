@@ -118,9 +118,10 @@ void Transform::Scale(DirectX::XMFLOAT3 scale)
 
 void Transform::RecalculateWorldMatrix()
 {
+
 	//make the world matrix out of scaling, rotation, and translation
-	DirectX::XMMATRIX worldM = (DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * 
-		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) * 
+	DirectX::XMMATRIX worldM = ((DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * 
+		DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z)) * 
 		DirectX::XMMatrixTranslation(position.x, position.y, position.z));
 
 	//store it and its inverse transpose
