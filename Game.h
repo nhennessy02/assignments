@@ -60,7 +60,7 @@ private:
 	std::shared_ptr<Mesh> diamond;
 	std::shared_ptr<Mesh> hexagon;
 
-	std::vector<GameEntity> entities;
+	std::vector<std::shared_ptr<GameEntity>> entities;
 
 	
 };

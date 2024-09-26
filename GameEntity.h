@@ -7,7 +7,7 @@ class GameEntity
 {
 public:
 	GameEntity() = default;
-	GameEntity(Mesh mesh);
+	GameEntity(std::shared_ptr<Mesh> mesh);
 	~GameEntity();
 
 	//getters
@@ -18,7 +18,7 @@ public:
 	void Draw();
 
 private:
-	Transform* entityTransform;
+	Transform entityTransform;
 	std::shared_ptr<Mesh> entityMesh;
 };
 

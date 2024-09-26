@@ -202,7 +202,9 @@ void Game::CreateGeometry()
 	unsigned int mesh1indices[] = { 0, 1, 2 };
 	triangle = std::make_shared<Mesh>(mesh1vertices,3,mesh1indices,3,"triangle");
 
-	entities.push_back(GameEntity(*triangle));
+	entities.push_back(std::make_shared<GameEntity>(triangle));
+	entities.push_back(std::make_shared<GameEntity>(triangle));
+	entities[1]->GetTransform()->SetPosition(0.9,0.9,0.9); 
 
 	Vertex mesh2vertices[] =
 	{
@@ -362,23 +364,28 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	//Constant Buffer Data & Mapping
 	{
-		constBufferData vsData;
-		vsData.colorTint = XMFLOAT4(colorTint[0], colorTint[1], colorTint[2], colorTint[3]);
-		//vsData.world = XMFLOAT4X4(entities[0].GetTransform()->GetWorldMatrix());
-
-		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-		Graphics::Context->Map(constBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-		Graphics::Context->Unmap(constBuffer.Get(), 0);
+		
 	}
 
 	// DRAW geometry
 	// - These steps are generally repeated for EACH object you draw
 	// - Other Direct3D calls will also be necessary to do more complex things
 	{
-		entities[0].Draw();
-		diamond->Draw();
-		hexagon->Draw();
+		for(auto& e : entities)
+		{
+			//update the constant buffer
+			constBufferData vsData;
+			vsData.colorTint = XMFLOAT4(colorTint[0], colorTint[1], colorTint[2], colorTint[3]);
+			vsData.world = e->GetTransform()->GetWorldMatrix();
+
+			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+			Graphics::Context->Map(constBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+			memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+			Graphics::Context->Unmap(constBuffer.Get(), 0);
+
+			//draw the shape
+			e->Draw();
+		}
 	}
 
 	ImGui::Render(); // Turns this frame’s UI into renderable triangles

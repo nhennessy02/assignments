@@ -65,6 +65,7 @@ DirectX::XMFLOAT3 Transform::GetScale()
 
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 {
+	RecalculateWorldMatrix();
 	return world;
 }
 
