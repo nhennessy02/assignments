@@ -15,12 +15,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 	int GetIndexCount();
 	int GetVertexCount();
-	char GetName();
 	void Draw();
 
 	// Constructor(s)
 	Mesh() = default;
-	Mesh(Vertex* vertices, unsigned int vertexCount, unsigned int* indices, unsigned int indicesCount, const char* meshName);
+	Mesh(Vertex* vertices, unsigned int vertexCount, unsigned int* indices, unsigned int indicesCount);
 	~Mesh();
 
 private:
@@ -32,9 +31,6 @@ private:
 	// The amount of indices and vertices in the buffers
 	unsigned int indicesCount;
 	unsigned int vertexCount;
-
-	//Extra data
-	const char *meshName;
 	
 };
 

@@ -1,11 +1,10 @@
 #include "Mesh.h"
 
-Mesh::Mesh(Vertex* vertices, unsigned int vertexCount, unsigned int* indices, unsigned int indicesCount,const char* meshName)
+Mesh::Mesh(Vertex* vertices, unsigned int vertexCount, unsigned int* indices, unsigned int indicesCount)
 {
 	// transfer the numbers to the mesh's values
 	this->vertexCount = (unsigned int)vertexCount;
 	this->indicesCount = (unsigned int)indicesCount;
-	this->meshName = meshName;
 
 	// Create the vertex buffer
 	{
@@ -69,10 +68,6 @@ int Mesh::GetVertexCount()
 	return vertexCount;
 }
 
-char Mesh::GetName()
-{
-	return (char)meshName;
-}
 
 void Mesh::Draw()
 {

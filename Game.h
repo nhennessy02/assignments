@@ -65,11 +65,11 @@ private:
 
 	//transform stuff
 	DirectX::XMFLOAT3 mover = { 0.0f, 0.0f, 0.0f };
-	float moveFactor = 0.25;
+	float moveFactor = 0.25f;
 	DirectX::XMFLOAT3 rotator = { 0.0f, 0.0f, 0.0f };
-	float rotateFactor = 1.0;
+	float rotateFactor = 1.0f;
 	DirectX::XMFLOAT3 scaler = { 1.0f, 1.0f, 1.0f };
-	float scaleFactor = 0.6;
+	float scaleFactor = 0.6f;
 	
 };
 

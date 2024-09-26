@@ -201,7 +201,7 @@ void Game::CreateGeometry()
 		{ XMFLOAT3(-0.3f, -0.3f, +0.0f), green },
 	};
 	unsigned int mesh1indices[] = { 0, 1, 2 };
-	triangle = std::make_shared<Mesh>(mesh1vertices,3,mesh1indices,3,"triangle");
+	triangle = std::make_shared<Mesh>(mesh1vertices,3,mesh1indices,3);
 
 	entities.push_back(std::make_shared<GameEntity>(triangle));
 	entities.push_back(std::make_shared<GameEntity>(triangle));
@@ -214,13 +214,13 @@ void Game::CreateGeometry()
 		{ XMFLOAT3(-0.05f, +0.0f, +0.0f), black },
 	};
 	unsigned int mesh2indices[] = { 0, 1, 3, 1, 2, 3 };
-	diamond = std::make_shared<Mesh>(mesh2vertices, 4, mesh2indices, 6, "diamond");
+	diamond = std::make_shared<Mesh>(mesh2vertices, 4, mesh2indices, 6);
 
 
 	entities.push_back(std::make_shared<GameEntity>(diamond));
 	entities.push_back(std::make_shared<GameEntity>(diamond));
-	entities[2]->GetTransform()->SetPosition(0.5, 0.6, 0.0);
-	entities[3]->GetTransform()->SetPosition(0.8, 0.6, 0.0);
+	entities[2]->GetTransform()->SetPosition(0.5f, 0.6f, 0.0f);
+	entities[3]->GetTransform()->SetPosition(0.8f, 0.6f, 0.0f);
 
 	Vertex mesh3vertices[] =
 	{
@@ -231,10 +231,10 @@ void Game::CreateGeometry()
 		{ XMFLOAT3(+0.1f, +0.0f, +0.0f), red },
 	};
 	unsigned int mesh3indices[] = { 0, 2, 1, 2, 3, 1, 2, 4, 3 };
-	hexagon = std::make_shared<Mesh>(mesh3vertices, 5, mesh3indices, 9, "hexagon");
+	hexagon = std::make_shared<Mesh>(mesh3vertices, 5, mesh3indices, 9);
 
 	entities.push_back(std::make_shared<GameEntity>(hexagon));
-	entities[4]->GetTransform()->SetPosition(0.6, -0.7, 0.0);
+	entities[4]->GetTransform()->SetPosition(0.6f, -0.7f, 0.0f);
 
 }
 
@@ -337,26 +337,8 @@ void Game::BuildUI(float deltaTime)
 	if(disableAll)
 		ImGui::EndDisabled();
 
-	//Extra UI
-	/*if (ImGui::CollapsingHeader("Extra Features"))
-	{
-		ImGui::InputText("Change Window Name (buggy)", windowName, IM_ARRAYSIZE(windowName));
-
-		if (ImGui::Button("Button")){
-			clicked = true;
-			clickCounter++;
-		}
-		if (clicked){
-			ImGui::SameLine();
-			ImGui::Text("Ow!");
-		}
-
-		ImGui::Text("Times Clicked: %i times", clickCounter);
-		ImGui::Checkbox("Disable Everything Above!!!", &disableAll);
-	}*/
-
 	//Mesh UI
-	if (ImGui::CollapsingHeader("Mesh Information"))
+	/*if (ImGui::CollapsingHeader("Mesh Information"))
 	{
 		ImGui::ColorEdit4("Color Tint", colorTint);
 		if (ImGui::CollapsingHeader("Mesh: Triangle"))
@@ -377,12 +359,41 @@ void Game::BuildUI(float deltaTime)
 			ImGui::Text("Vertices: %i", hexagon->GetVertexCount());
 			ImGui::Text("Indices: %i", hexagon->GetIndexCount());
 		}
-	}
+	}*/
+
+	XMFLOAT3 posi;
+	XMFLOAT3 rota;
+	XMFLOAT3 scal;
 
 	if (ImGui::CollapsingHeader("Scene Entities")) 
 	{
-
+		for (size_t i = 0; i < entities.size(); i++)
+		{
+			if(ImGui::TreeNode("Entity", "Entity %d", i))
+			{
+				ImGui::PushID(i);
+				posi = entities[i]->GetTransform()->GetPosition();
+				if(ImGui::DragFloat3("Position",(&posi.x),0.01f))
+				{
+					entities[i]->GetTransform()->SetPosition(posi);
+				}
+				rota = entities[i]->GetTransform()->GetPitchYawRoll();
+				if (ImGui::DragFloat3("Rotation", (&rota.x), 0.01f))
+				{
+					entities[i]->GetTransform()->SetRotation(rota);
+				}
+				scal = entities[i]->GetTransform()->GetScale();
+				if (ImGui::DragFloat3("Scale", (&scal.x), 0.01f))
+				{
+					entities[i]->GetTransform()->SetScale(scal);
+				}
+				ImGui::PopID();
+				ImGui::TreePop();
+			}
+		}
+		
 	}
+	
 	ImGui::End();
 }
 
