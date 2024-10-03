@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include "Vertex.h"
 #include "Graphics.h"
+#include "Camera.h"
 
 class Mesh
 {

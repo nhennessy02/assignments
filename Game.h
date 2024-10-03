@@ -6,6 +6,7 @@
 #include <vector>
 #include "Mesh.h"
 #include "GameEntity.h"
+#include "Camera.h"
 
 class Game
 {
@@ -70,6 +71,9 @@ private:
 	float rotateFactor = 1.0f;
 	DirectX::XMFLOAT3 scaler = { 1.0f, 1.0f, 1.0f };
 	float scaleFactor = 0.6f;
+
+	//camera
+	std::shared_ptr<Camera> mainCamera;
 	
 };
 

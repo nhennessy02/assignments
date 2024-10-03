@@ -74,6 +74,33 @@ DirectX::XMFLOAT4X4 Transform::GetWorldInverseTransposeMatrix()
 	return worldInverseTranspose;
 }
 
+DirectX::XMFLOAT3 Transform::GetRight()
+{
+	//rotate the world's right vector by transform's rotation
+	DirectX::XMVECTOR rightVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 1,0,0 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	//convert to float3 and return
+	DirectX::XMFLOAT3 rightFloat3{ DirectX::XMVectorGetX(rightVector), DirectX::XMVectorGetY(rightVector), DirectX::XMVectorGetZ(rightVector) };
+	return rightFloat3;
+}
+
+DirectX::XMFLOAT3 Transform::GetUp()
+{
+	//rotate the world's up vector by transform's rotation
+	DirectX::XMVECTOR upVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,1,0 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	//convert to float3 and return
+	DirectX::XMFLOAT3 upFloat3{ DirectX::XMVectorGetX(upVector), DirectX::XMVectorGetY(upVector), DirectX::XMVectorGetZ(upVector) };
+	return upFloat3;
+}
+
+DirectX::XMFLOAT3 Transform::GetForward()
+{
+	//rotate the world's forward vector by transform's rotation
+	DirectX::XMVECTOR forwardVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,0,1 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	//convert to float3 and return
+	DirectX::XMFLOAT3 forwardFloat3{ DirectX::XMVectorGetX(forwardVector), DirectX::XMVectorGetY(forwardVector), DirectX::XMVectorGetZ(forwardVector) };
+	return forwardFloat3;
+}
+
 void Transform::MoveAbsolute(float x, float y, float z)
 {
 	position.x += x;
@@ -114,6 +141,32 @@ void Transform::Scale(DirectX::XMFLOAT3 scale)
 	this->scale.x *= scale.x;
 	this->scale.y *= scale.y;
 	this->scale.z *= scale.z;
+}
+
+void Transform::MoveRelative(float x, float y, float z)
+{
+	//convert to vectors
+	DirectX::XMVECTOR movementVector{ x,y,z };
+	DirectX::XMVECTOR currentRotation = DirectX::XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+	//rotate the vector
+	DirectX::XMVECTOR direction = DirectX::XMVector3Rotate(movementVector, currentRotation);
+	//add it's values to position
+	position.x += DirectX::XMVectorGetX(direction);
+	position.y += DirectX::XMVectorGetY(direction);
+	position.z += DirectX::XMVectorGetZ(direction);
+}
+
+void Transform::MoveRelative(DirectX::XMFLOAT3 offset)
+{
+	//convert to vectors
+	DirectX::XMVECTOR movementVector = { offset.x,offset.y,offset.z };
+	DirectX::XMVECTOR currentRotation = DirectX::XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+	//rotate the vector
+		DirectX::XMVECTOR direction = DirectX::XMVector3Rotate(movementVector, currentRotation);
+	//add it's values to position
+	position.x += DirectX::XMVectorGetX(direction);
+	position.y += DirectX::XMVectorGetY(direction);
+	position.z += DirectX::XMVectorGetZ(direction);
 }
 
 void Transform::RecalculateWorldMatrix()

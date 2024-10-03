@@ -32,7 +32,9 @@ void Game::Initialize()
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateBuffers();
+	mainCamera = std::make_shared<Camera>(DirectX::XMFLOAT3{ -10,0,0 }, 90.0, 5.0);
 	CreateGeometry();
+	
 
 	// Initialize ImGui itself & platform/renderer backends
 	IMGUI_CHECKVERSION();
@@ -247,6 +249,7 @@ void Game::CreateGeometry()
 // --------------------------------------------------------
 void Game::OnResize()
 {
+	mainCamera->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
 }
 
 
@@ -280,6 +283,7 @@ void Game::Update(float deltaTime, float totalTime)
 		rotator.z = 0.0f;
 	entities[4]->GetTransform()->SetRotation(rotator);
 
+	mainCamera->Update(deltaTime);
 	ImGuiUpdate(deltaTime);
 	BuildUI(deltaTime);
 
@@ -422,6 +426,10 @@ void Game::Draw(float deltaTime, float totalTime)
 			constBufferData vsData;
 			vsData.colorTint = XMFLOAT4(colorTint[0], colorTint[1], colorTint[2], colorTint[3]);
 			vsData.world = e->GetTransform()->GetWorldMatrix();
+			//camera stuff
+			vsData.view = mainCamera->GetViewMatrix();
+			vsData.projection = mainCamera->GetProjectionMatrix();
+
 
 			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 			Graphics::Context->Map(constBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
