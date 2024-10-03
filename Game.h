@@ -72,8 +72,9 @@ private:
 	DirectX::XMFLOAT3 scaler = { 1.0f, 1.0f, 1.0f };
 	float scaleFactor = 0.6f;
 
-	//camera
-	std::shared_ptr<Camera> mainCamera;
+	//cameras
+	std::vector<std::shared_ptr<Camera>> cameras;
+	int activeCamera = 0;
 	
 };
 

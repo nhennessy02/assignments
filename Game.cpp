@@ -32,8 +32,12 @@ void Game::Initialize()
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateBuffers();
-	mainCamera = std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,0,-10.0 }, XM_PIDIV2, 5.0);
-	mainCamera->UpdateProjectionMatrix(XM_PIDIV2);
+	cameras.push_back(std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,0,-10.0 }, XM_PIDIV2, 5.0));
+	cameras.push_back(std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,1.0,-1.0 }, XMConvertToRadians(45), 2.0));
+	for (auto& c : cameras)
+	{
+		c->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
+	}
 	CreateGeometry();
 	
 
@@ -250,8 +254,11 @@ void Game::CreateGeometry()
 // --------------------------------------------------------
 void Game::OnResize()
 {
-	if(mainCamera)
-		mainCamera->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
+	for (auto& c : cameras)
+	{
+		if(c)
+			c->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
+	}
 }
 
 
@@ -285,7 +292,7 @@ void Game::Update(float deltaTime, float totalTime)
 		rotator.z = 0.0f;
 	entities[4]->GetTransform()->SetRotation(rotator);
 
-	mainCamera->Update(deltaTime);
+	cameras[activeCamera]->Update(deltaTime);
 	ImGuiUpdate(deltaTime);
 	BuildUI(deltaTime);
 
@@ -373,9 +380,10 @@ void Game::BuildUI(float deltaTime)
 
 	if (ImGui::CollapsingHeader("Scene Entities")) 
 	{
-		for (size_t i = 0; i < entities.size(); i++)
+		for (int i = 0; i < entities.size(); i++)
 		{
-			if(ImGui::TreeNode("Entity", "Entity %d", i))
+			ImGui::PushID(i);
+			if(ImGui::TreeNode("","Entity %d", i))
 			{
 				ImGui::PushID(i);
 				posi = entities[i]->GetTransform()->GetPosition();
@@ -393,11 +401,37 @@ void Game::BuildUI(float deltaTime)
 				{
 					entities[i]->GetTransform()->SetScale(scal);
 				}
-				ImGui::PopID();
 				ImGui::TreePop();
+				ImGui::PopID();
 			}
+			ImGui::PopID();
 		}
 		
+	}
+
+	if(ImGui::CollapsingHeader("Cameras"))
+	{
+		ImGui::Text("Current Camera: %i",activeCamera+1);
+		ImGui::SeparatorText("Camera Position");
+		ImGui::BulletText("X : %f", cameras[activeCamera]->GetTransform()->GetPosition().x);
+		ImGui::BulletText("Y : %f", cameras[activeCamera]->GetTransform()->GetPosition().y);
+		ImGui::BulletText("Z : %f", cameras[activeCamera]->GetTransform()->GetPosition().z);
+		ImGui::SeparatorText("Camera Data");
+		ImGui::BulletText("FOV : %f", XMConvertToDegrees(cameras[activeCamera]->GetFOV()));
+		ImGui::BulletText("Movespeed : %f", cameras[activeCamera]->GetMovespeed());
+		
+		ImGui::NewLine();
+		if(ImGui::Button("<-- Prev Camera"))
+		{
+			if (activeCamera > 0)
+				activeCamera--;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Next Camera -->"))
+		{
+			if(activeCamera < cameras.size()-1)
+				activeCamera++;
+		}
 	}
 	
 	ImGui::End();
@@ -429,8 +463,8 @@ void Game::Draw(float deltaTime, float totalTime)
 			vsData.colorTint = XMFLOAT4(colorTint[0], colorTint[1], colorTint[2], colorTint[3]);
 			vsData.world = e->GetTransform()->GetWorldMatrix();
 			//camera stuff
-			vsData.view = mainCamera->GetViewMatrix();
-			vsData.projection = mainCamera->GetProjectionMatrix();
+			vsData.view = cameras[activeCamera]->GetViewMatrix();
+			vsData.projection = cameras[activeCamera]->GetProjectionMatrix();
 
 
 			D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
