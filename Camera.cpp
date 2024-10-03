@@ -3,11 +3,10 @@
 
 Camera::Camera(DirectX::XMFLOAT3 initPosition, float fov, float movespeed)
 {
-	cameraTransform.SetPosition(initPosition);
+	transform.SetPosition(initPosition);
 	this->fov = fov;
 	this->movespeed = movespeed;
 
-	//INITIALIZE MATRICES HERE
 }
 
 Camera::~Camera()
@@ -38,9 +37,13 @@ void Camera::UpdateViewMatrix()
 
 void Camera::Update(float dt)
 {
-	if(Input::KeyDown('W'))
+	if (Input::KeyDown('W'))
+		transform.MoveRelative(DirectX::XMFLOAT3{ 0,0,movespeed * dt });
+	if (Input::KeyDown('S'))
+		transform.MoveRelative(DirectX::XMFLOAT3{ 0,0,-movespeed * dt });
+	if(Input::KeyDown('D'))
 		transform.MoveRelative(DirectX::XMFLOAT3{ movespeed * dt,0,0 });
-	if(Input::KeyDown('S'))
+	if(Input::KeyDown('A'))
 		transform.MoveRelative(DirectX::XMFLOAT3{ -movespeed * dt,0,0 });
 
 	UpdateViewMatrix();

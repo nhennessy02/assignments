@@ -77,7 +77,7 @@ DirectX::XMFLOAT4X4 Transform::GetWorldInverseTransposeMatrix()
 DirectX::XMFLOAT3 Transform::GetRight()
 {
 	//rotate the world's right vector by transform's rotation
-	DirectX::XMVECTOR rightVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 1,0,0 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	DirectX::XMVECTOR rightVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 1,0,0 }, DirectX::XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z));
 	//convert to float3 and return
 	DirectX::XMFLOAT3 rightFloat3{ DirectX::XMVectorGetX(rightVector), DirectX::XMVectorGetY(rightVector), DirectX::XMVectorGetZ(rightVector) };
 	return rightFloat3;
@@ -86,7 +86,7 @@ DirectX::XMFLOAT3 Transform::GetRight()
 DirectX::XMFLOAT3 Transform::GetUp()
 {
 	//rotate the world's up vector by transform's rotation
-	DirectX::XMVECTOR upVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,1,0 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	DirectX::XMVECTOR upVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,1,0 }, DirectX::XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z));
 	//convert to float3 and return
 	DirectX::XMFLOAT3 upFloat3{ DirectX::XMVectorGetX(upVector), DirectX::XMVectorGetY(upVector), DirectX::XMVectorGetZ(upVector) };
 	return upFloat3;
@@ -95,7 +95,7 @@ DirectX::XMFLOAT3 Transform::GetUp()
 DirectX::XMFLOAT3 Transform::GetForward()
 {
 	//rotate the world's forward vector by transform's rotation
-	DirectX::XMVECTOR forwardVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,0,1 }, DirectX::XMVECTOR{ rotation.x,rotation.y,rotation.z });
+	DirectX::XMVECTOR forwardVector = DirectX::XMVector3Rotate(DirectX::XMVECTOR{ 0,0,1 }, DirectX::XMQuaternionRotationRollPitchYaw(rotation.x, rotation.y, rotation.z));
 	//convert to float3 and return
 	DirectX::XMFLOAT3 forwardFloat3{ DirectX::XMVectorGetX(forwardVector), DirectX::XMVectorGetY(forwardVector), DirectX::XMVectorGetZ(forwardVector) };
 	return forwardFloat3;

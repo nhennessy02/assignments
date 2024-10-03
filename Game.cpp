@@ -32,7 +32,8 @@ void Game::Initialize()
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateBuffers();
-	mainCamera = std::make_shared<Camera>(DirectX::XMFLOAT3{ -10,0,0 }, 90.0, 5.0);
+	mainCamera = std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,0,-10.0 }, XM_PIDIV2, 5.0);
+	mainCamera->UpdateProjectionMatrix(XM_PIDIV2);
 	CreateGeometry();
 	
 
@@ -249,7 +250,8 @@ void Game::CreateGeometry()
 // --------------------------------------------------------
 void Game::OnResize()
 {
-	mainCamera->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
+	if(mainCamera)
+		mainCamera->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
 }
 
 
