@@ -105,7 +105,7 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateGeometry()
 {
-	sphere = std::make_shared<Mesh>(*FixPath(L"../../Assets/Models/sphere.obj").c_str());
+	sphere = std::make_shared<Mesh>(FixPath("../../Assets/Models/sphere.obj").c_str());
 	entities.push_back(std::make_shared<GameEntity>(sphere,mat1Red));
 	entities[0]->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
 
@@ -155,7 +155,7 @@ void Game::Update(float deltaTime, float totalTime)
 	else if (mover.x <= -1.0f)
 		moveFactor = -moveFactor;
 	entities[0]->GetTransform()->SetPosition(mover.x,0.0f,0.0f);
-	entities[1]->GetTransform()->SetPosition(0.0f, mover.y, 0.0f);
+	//entities[1]->GetTransform()->SetPosition(0.0f, mover.y, 0.0f);
 
 
 	scaler.x = scaler.x + scaleFactor * deltaTime;
@@ -164,14 +164,14 @@ void Game::Update(float deltaTime, float totalTime)
 		scaleFactor = -scaleFactor;
 	else if (scaler.x <= 0.0f)
 		scaleFactor = -scaleFactor;
-	entities[2]->GetTransform()->SetScale(scaler);
-	entities[3]->GetTransform()->SetScale(-scaler.x, -scaler.y, scaler.z);
+	//entities[2]->GetTransform()->SetScale(scaler);
+	//entities[3]->GetTransform()->SetScale(-scaler.x, -scaler.y, scaler.z);
 
 
 	rotator.z = rotator.z + rotateFactor * deltaTime;
 	if (rotator.z >= 6.28319f)
 		rotator.z = 0.0f;
-	entities[4]->GetTransform()->SetRotation(rotator);
+	//entities[4]->GetTransform()->SetRotation(rotator);
 
 	cameras[activeCamera]->Update(deltaTime);
 	ImGuiUpdate(deltaTime);

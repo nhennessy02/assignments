@@ -266,7 +266,7 @@ Mesh::Mesh(const char* modelFile)
 
 			// Storing the data
 			D3D11_SUBRESOURCE_DATA initialVertexData = {};
-			initialVertexData.pSysMem = &verts;
+			initialVertexData.pSysMem = &verts[0];
 
 			// Actually make the buffer
 			Graphics::Device->CreateBuffer(&vbd, &initialVertexData, vertexBuffer.GetAddressOf());
@@ -284,7 +284,7 @@ Mesh::Mesh(const char* modelFile)
 
 			// Storing the data
 			D3D11_SUBRESOURCE_DATA initialIndexData = {};
-			initialIndexData.pSysMem = &indices;
+			initialIndexData.pSysMem = &indices[0];
 
 			// Actually make the buffer
 			Graphics::Device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
