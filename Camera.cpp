@@ -6,6 +6,8 @@ Camera::Camera(DirectX::XMFLOAT3 initPosition, float fov, float movespeed)
 	transform.SetPosition(initPosition);
 	this->fov = fov;
 	this->movespeed = movespeed;
+	DirectX::XMStoreFloat4x4(&projectionMatrix, DirectX::XMMatrixIdentity());
+	DirectX::XMStoreFloat4x4(&viewMatrix, DirectX::XMMatrixIdentity());
 }
 
 Camera::~Camera()

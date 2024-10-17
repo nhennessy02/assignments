@@ -7,6 +7,7 @@
 #include "Mesh.h"
 #include "GameEntity.h"
 #include "Camera.h"
+#include "SimpleShader.h"
 
 class Game
 {
@@ -29,9 +30,7 @@ private:
 
 	// Initialization helper methods - feel free to customize, combine, remove, etc.
 	void LoadShaders();
-	void CreateBuffers();
 	void CreateGeometry();
-
 
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the
@@ -39,12 +38,8 @@ private:
 	//  - More info here: https://github.com/Microsoft/DirectXTK/wiki/ComPtr
 
 	// Shaders and shader-related constructs
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
-
-	//Constant Buffer
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constBuffer;
+	std::shared_ptr<SimplePixelShader> pixelShader;
+	std::shared_ptr<SimpleVertexShader> vertexShader;
 
 	float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
 	bool demoVis = false;
@@ -57,9 +52,12 @@ private:
 	
 
 	//Meshes
-	std::shared_ptr<Mesh> triangle;
-	std::shared_ptr<Mesh> diamond;
-	std::shared_ptr<Mesh> hexagon;
+	std::shared_ptr<Mesh> sphere;
+
+	//materials
+	std::shared_ptr<Material> mat1Red;
+	std::shared_ptr<Material> mat2Blue;
+	std::shared_ptr<Material> mat3Yellow;
 
 	//entities
 	std::vector<std::shared_ptr<GameEntity>> entities;

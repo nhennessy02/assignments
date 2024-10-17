@@ -21,6 +21,7 @@ public:
 	// Constructor(s)
 	Mesh() = default;
 	Mesh(Vertex* vertices, unsigned int vertexCount, unsigned int* indices, unsigned int indicesCount);
+	Mesh(const char* modelFile);
 	~Mesh();
 
 private:
