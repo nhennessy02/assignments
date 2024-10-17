@@ -53,11 +53,40 @@ private:
 
 	//Meshes
 	std::shared_ptr<Mesh> sphere;
+	std::shared_ptr<Mesh> cylinder;
+	std::shared_ptr<Mesh> helix;
+	std::shared_ptr<Mesh> quad;
+	std::shared_ptr<Mesh> singleQuad;
+	std::shared_ptr<Mesh> cube;
+	std::shared_ptr<Mesh> torus; 
+	std::shared_ptr<Mesh> sphere2;
+	std::shared_ptr<Mesh> cylinder2;
+	std::shared_ptr<Mesh> helix2;
+	std::shared_ptr<Mesh> quad2;
+	std::shared_ptr<Mesh> singleQuad2;
+	std::shared_ptr<Mesh> cube2;
+	std::shared_ptr<Mesh> torus2; 
+	std::shared_ptr<Mesh> sphere3;
+	std::shared_ptr<Mesh> cylinder3;
+	std::shared_ptr<Mesh> helix3;
+	std::shared_ptr<Mesh> quad3;
+	std::shared_ptr<Mesh> singleQuad3;
+	std::shared_ptr<Mesh> cube3;
+	std::shared_ptr<Mesh> torus3;
+
+	//shaders
+	std::shared_ptr<SimplePixelShader> UVShader;
+	std::shared_ptr<SimplePixelShader> normalShader;
+	std::shared_ptr<SimplePixelShader> fancyShader;
 
 	//materials
+	std::shared_ptr<Material> mat0White;
 	std::shared_ptr<Material> mat1Red;
 	std::shared_ptr<Material> mat2Blue;
 	std::shared_ptr<Material> mat3Yellow;
+	std::shared_ptr<Material> UVMat;
+	std::shared_ptr<Material> normalMat;
+	std::shared_ptr<Material> fancyMat;
 
 	//entities
 	std::vector<std::shared_ptr<GameEntity>> entities;

@@ -11,16 +11,17 @@ struct VertexToPixel
 	//  |   Name          Semantic
 	//  |    |                |
 	//  v    v                v
-	float4 screenPosition	: SV_POSITION;
-	float4 color			: COLOR;
-	float3 normal			: NORMAL;       // for lighting
-	float2 uv				: TEXCOORD;     // for texture mapping
+	float4 screenPosition : SV_POSITION;
+	float4 color : COLOR;
+	float3 normal : NORMAL;       // for lighting
+	float2 uv : TEXCOORD;     // for texture mapping
 };
 
 //Data from the constant buffer
 cbuffer ExternalData : register(b0)
 {
-	float4 colorTint;
+	float screenWidth;
+	float screenHeight;
 }
 
 // --------------------------------------------------------
@@ -34,11 +35,10 @@ cbuffer ExternalData : register(b0)
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	// Just return the input color
-	// - This color (like most values passing through the rasterizer) is 
-	//   interpolated for each pixel between the corresponding vertices 
-	//   of the triangle we're rendering
-	input.color = colorTint;
+	//object color changes based on screen position, based on screen size
 
-	return input.color;
+	float scaledx = (input.screenPosition.x / screenWidth);
+	float scaledy = (input.screenPosition.y / screenHeight);
+
+	return float4(scaledx, 0, scaledy, 1);
 }

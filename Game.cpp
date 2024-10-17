@@ -31,16 +31,20 @@ void Game::Initialize()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
-	cameras.push_back(std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,0,-10.0 }, XM_PIDIV2, 5.0));
+	cameras.push_back(std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,4.0,-10.0 }, XM_PIDIV2, 5.0));
 	cameras.push_back(std::make_shared<Camera>(DirectX::XMFLOAT3{ 0,1.0,-1.0 }, XMConvertToRadians(45), 2.0));
 	for (auto& c : cameras)
 	{
 		c->UpdateProjectionMatrix((float)Window::Width() / Window::Height());
 	}
 	
+	mat0White = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader);
 	mat1Red = std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader);
 	mat2Blue = std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader);
 	mat3Yellow = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader);
+	UVMat = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, UVShader);
+	normalMat = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, normalShader);
+	fancyMat = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, fancyShader);
 
 	CreateGeometry();
 	
@@ -98,6 +102,12 @@ void Game::LoadShaders()
 		Graphics::Context, FixPath(L"VertexShader.cso").c_str());
 	pixelShader = std::make_shared<SimplePixelShader>(Graphics::Device,
 		Graphics::Context, FixPath(L"PixelShader.cso").c_str());
+	UVShader = std::make_shared<SimplePixelShader>(Graphics::Device,
+		Graphics::Context, FixPath(L"uvPS.cso").c_str());
+	normalShader = std::make_shared<SimplePixelShader>(Graphics::Device,
+		Graphics::Context, FixPath(L"normalPS.cso").c_str());
+	fancyShader = std::make_shared<SimplePixelShader>(Graphics::Device,
+		Graphics::Context, FixPath(L"fancyPS.cso").c_str());
 }
 
 // --------------------------------------------------------
@@ -105,9 +115,97 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateGeometry()
 {
-	sphere = std::make_shared<Mesh>(FixPath("../../Assets/Models/sphere.obj").c_str());
-	entities.push_back(std::make_shared<GameEntity>(sphere,mat1Red));
-	entities[0]->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
+	//custom materials
+	{
+		sphere = std::make_shared<Mesh>(FixPath("../../Assets/Models/sphere.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(sphere,fancyMat));
+		entities[0]->GetTransform()->SetPosition(-12.0f, 0.0f, 0.0f);
+
+		cylinder = std::make_shared<Mesh>(FixPath("../../Assets/Models/cylinder.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cylinder, mat0White));
+		entities[1]->GetTransform()->SetPosition(-8.0f, 0.0f, 0.0f);
+
+		cube = std::make_shared<Mesh>(FixPath("../../Assets/Models/cube.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cube, mat0White));
+		entities[2]->GetTransform()->SetPosition(-4.0f, 0.0f, 0.0f);
+
+		helix = std::make_shared<Mesh>(FixPath("../../Assets/Models/helix.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(helix, mat1Red));
+		entities[3]->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
+
+		quad = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad_double_sided.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(quad, mat1Red));
+		entities[4]->GetTransform()->SetPosition(4.0f, 0.0f, 0.0f);
+
+		singleQuad = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(singleQuad, mat3Yellow));
+		entities[5]->GetTransform()->SetPosition(8.0f, 0.0f, 0.0f);
+
+		torus = std::make_shared<Mesh>(FixPath("../../Assets/Models/torus.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(torus, mat3Yellow));
+		entities[6]->GetTransform()->SetPosition(12.0f, 0.0f, 0.0f);
+	}
+	//uv material
+	{
+		sphere2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/sphere.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(sphere, UVMat));
+		entities[7]->GetTransform()->SetPosition(-12.0f, 4.0f, 0.0f);
+
+		cylinder2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/cylinder.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cylinder, UVMat));
+		entities[8]->GetTransform()->SetPosition(-8.0f, 4.0f, 0.0f);
+
+		cube2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/cube.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cube, UVMat));
+		entities[9]->GetTransform()->SetPosition(-4.0f, 4.0f, 0.0f);
+
+		helix2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/helix.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(helix, UVMat));
+		entities[10]->GetTransform()->SetPosition(0.0f, 4.0f, 0.0f);
+
+		quad2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad_double_sided.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(quad, UVMat));
+		entities[11]->GetTransform()->SetPosition(4.0f, 4.0f, 0.0f);
+
+		singleQuad2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(singleQuad, UVMat));
+		entities[12]->GetTransform()->SetPosition(8.0f, 4.0f, 0.0f);
+
+		torus2 = std::make_shared<Mesh>(FixPath("../../Assets/Models/torus.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(torus, UVMat));
+		entities[13]->GetTransform()->SetPosition(12.0f, 4.0f, 0.0f);
+	}
+	//normal material
+	{
+		sphere3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/sphere.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(sphere, normalMat));
+		entities[14]->GetTransform()->SetPosition(-12.0f, 8.0f, 0.0f);
+
+		cylinder3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/cylinder.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cylinder, normalMat));
+		entities[15]->GetTransform()->SetPosition(-8.0f, 8.0f, 0.0f);
+
+		cube3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/cube.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(cube, normalMat));
+		entities[16]->GetTransform()->SetPosition(-4.0f, 8.0f, 0.0f);
+
+		helix3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/helix.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(helix, normalMat));
+		entities[17]->GetTransform()->SetPosition(0.0f, 8.0f, 0.0f);
+
+		quad3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad_double_sided.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(quad, normalMat));
+		entities[18]->GetTransform()->SetPosition(4.0f, 8.0f, 0.0f);
+
+		singleQuad3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/quad.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(singleQuad, normalMat));
+		entities[19]->GetTransform()->SetPosition(8.0f, 8.0f, 0.0f);
+
+		torus3 = std::make_shared<Mesh>(FixPath("../../Assets/Models/torus.obj").c_str());
+		entities.push_back(std::make_shared<GameEntity>(torus, normalMat));
+		entities[20]->GetTransform()->SetPosition(12.0f, 8.0f, 0.0f);
+	}
+
 
 	//entity declaration example
 	//Vertex mesh3vertices[] =
@@ -154,7 +252,7 @@ void Game::Update(float deltaTime, float totalTime)
 		moveFactor = -moveFactor;
 	else if (mover.x <= -1.0f)
 		moveFactor = -moveFactor;
-	entities[0]->GetTransform()->SetPosition(mover.x,0.0f,0.0f);
+	//entities[0]->GetTransform()->SetPosition(mover.x,0.0f,0.0f);
 	//entities[1]->GetTransform()->SetPosition(0.0f, mover.y, 0.0f);
 
 
@@ -342,13 +440,18 @@ void Game::Draw(float deltaTime, float totalTime)
 		{
 			//filling external data struct
 			std::shared_ptr<SimpleVertexShader> vs = e->GetMaterial()->GetVertexShader();
-			vs->SetFloat4("colorTint", e->GetMaterial()->GetColorTint());
 			vs->SetMatrix4x4("world", e->GetTransform()->GetWorldMatrix()); 
 			vs->SetMatrix4x4("view", cameras[activeCamera]->GetViewMatrix());
 			vs->SetMatrix4x4("projection", cameras[activeCamera]->GetProjectionMatrix());
 
+			std::shared_ptr<SimplePixelShader> ps = e->GetMaterial()->GetPixelShader();
+			ps->SetFloat4("colorTint", e->GetMaterial()->GetColorTint());
+			ps->SetFloat("screenWidth", (float)Window::Width());
+			ps->SetFloat("screenHeight", (float)Window::Height());
+
 			//Copy the data to the GPU
 			vs->CopyAllBufferData();
+			ps->CopyAllBufferData();
 
 			//draw the shape
 			e->Draw();
