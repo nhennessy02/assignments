@@ -8,13 +8,14 @@
 class Material
 {
 public:
-	Material(DirectX::XMFLOAT4 colorTint, std::shared_ptr<SimpleVertexShader> verShader, std::shared_ptr<SimplePixelShader> pixShader);
+	Material(DirectX::XMFLOAT4 colorTint,float roughness, std::shared_ptr<SimpleVertexShader> verShader, std::shared_ptr<SimplePixelShader> pixShader);
 	~Material();
 
 	//getters
 	DirectX::XMFLOAT4 GetColorTint();
 	std::shared_ptr<SimpleVertexShader> GetVertexShader();
 	std::shared_ptr<SimplePixelShader> GetPixelShader();
+	float GetRoughness();
 
 	//setters
 	void SetColorTint(DirectX::XMFLOAT4 colorTint);
@@ -23,6 +24,7 @@ public:
 
 private:
 	DirectX::XMFLOAT4 colorTint;
+	float roughness;
 	std::shared_ptr<SimpleVertexShader> verShader;
 	std::shared_ptr<SimplePixelShader> pixShader;
 };

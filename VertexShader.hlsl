@@ -1,43 +1,10 @@
-
-// Struct representing a single vertex worth of data
-// - This should match the vertex definition in our C++ code
-// - By "match", I mean the size, order and number of members
-// - The name of the struct itself is unimportant, but should be descriptive
-// - Each variable must have a semantic, which defines its usage
-struct VertexShaderInput
-{ 
-	// Data type
-	//  |
-	//  |   Name          Semantic
-	//  |    |                |
-	//  v    v                v
-	float3 localPosition	: POSITION;     // XYZ position
-	float3 normal			: NORMAL;       // for lighting
-	float2 uv				: TEXCOORD;     // for texture mapping
-};
-
-// Struct representing the data we're sending down the pipeline
-// - Should match our pixel shader's input (hence the name: Vertex to Pixel)
-// - At a minimum, we need a piece of data defined tagged as SV_POSITION
-// - The name of the struct itself is unimportant, but should be descriptive
-// - Each variable must have a semantic, which defines its usage
-struct VertexToPixel
-{
-	// Data type
-	//  |
-	//  |   Name          Semantic
-	//  |    |                |
-	//  v    v                v
-	float4 screenPosition	: SV_POSITION;	// XYZW position (System Value Position)
-	float4 color			: COLOR;        // RGBA color
-	float3 normal			: NORMAL;
-	float2 uv				: TEXCOORD;
-};
+#include "ShaderIncludes.hlsli"
 
 //Data from the constant buffer
 cbuffer ExternalData : register(b0)
 {
 	float4x4 world;
+	float4x4 worldInvTranspose;
 	float4x4 view;
 	float4x4 projection;
 }
@@ -54,22 +21,16 @@ VertexToPixel main( VertexShaderInput input )
 	// Set up output struct
 	VertexToPixel output;
 
-	// Here we're essentially passing the input position directly through to the next
-	// stage (rasterizer), though it needs to be a 4-component vector now.  
-	// - To be considered within the bounds of the screen, the X and Y components 
-	//   must be between -1 and 1.  
-	// - The Z component must be between 0 and 1.  
-	// - Each of these components is then automatically divided by the W component, 
-	//   which we're leaving at 1.0 for now (this is more useful when dealing with 
-	//   a perspective projection matrix, which we'll get to in the future).
-	// 
 	// Multiply the three matrices together first
 	matrix wvp = mul(projection, mul(view, world));
 	output.screenPosition = mul(wvp, float4(input.localPosition, 1.0f));
+	//do the same for world position
+	output.worldPosition = mul(world, float4(input.localPosition, 1)).xyz;
 
 	// Pass the data through
 	output.uv = input.uv;
-	output.normal = input.normal;
+
+	output.normal = mul((float3x3)worldInvTranspose, input.normal); //cast the normal to a 3x3
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)

@@ -8,6 +8,7 @@
 #include "GameEntity.h"
 #include "Camera.h"
 #include "SimpleShader.h"
+#include "Lights.h"
 
 class Game
 {
@@ -102,6 +103,10 @@ private:
 	//cameras
 	std::vector<std::shared_ptr<Camera>> cameras;
 	int activeCamera = 0;
+
+	//lights
+	DirectX::XMFLOAT3 ambientColor = { 0.1, 0.1, 0.25 };
+	Light directionalLight1 = {};
 	
 };
 
