@@ -49,12 +49,21 @@ struct VertexToPixel
     float2 uv				: TEXCOORD; // for texture mapping
     float3 worldPosition    : POSITION;
 };
+float Attenuate(Light light, float3 worldPos)
+{
+    float dist = distance(light.Position, worldPos);
+    float att = saturate(1.0f - (dist * dist / (light.Range * light.Range)));
+    return att * att;
+}
 
-//Light calculation method
+//returns the DIFFUSE component
 float4 calcLightDiffuse(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor)
 {
-	float3 direction = normalize(currentLight.Position - worldPos);
-    //when directional just use NEGATIVE direction
+    float3 direction;
+    if (currentLight.Type = LIGHT_TYPE_POINT) //point light
+        direction = normalize(currentLight.Position - worldPos);
+    else //directional light
+        direction = -direction;
 
 	//from reading
 	float3 diffuseTerm =
@@ -71,12 +80,13 @@ float4 calcLightDiffuse(Light currentLight, float3 worldPos, float3 inputNormal,
 	return finalColor;
 }
 
+//returns the SPECULAR component
 float4 calcLightSpecular(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor, float shininess, float3 cameraPos)
 {
     float3 lightRefl = reflect(currentLight.Direction, inputNormal);
     float3 directionToCam = normalize(cameraPos - worldPos);
     
-    float RdotV = saturate(dot(lightRefl, directionToCam));
+    float RdotV = saturate(dot(lightRefl, -directionToCam));
     
     float3 specularTerm =
     pow(RdotV, shininess) *
@@ -84,12 +94,54 @@ float4 calcLightSpecular(Light currentLight, float3 worldPos, float3 inputNormal
     inputColor;
     
     float4 finalColor;
-    finalColor.x = inputColor.x + specularTerm.x;
-    finalColor.y = inputColor.y + specularTerm.y;
-    finalColor.z = inputColor.z + specularTerm.z;
+    finalColor.x = specularTerm.x;
+    finalColor.y = specularTerm.y;
+    finalColor.z = specularTerm.z;
     finalColor.w = 1.0f;
 
     return finalColor;
 }
+
+//returns the PHONG component of the equation
+float4 calcLightPhong(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor, float shininess, float3 cameraPos)
+{
+    float3 direction;
+        direction = currentLight.Direction; //directional light by default
+    
+    if (currentLight.Type == LIGHT_TYPE_POINT) //point light
+    {
+        direction = normalize(currentLight.Position - worldPos);
+    } 
+
+	//from reading
+        float3 diffuseTerm =
+		saturate(dot(inputNormal, direction)) * // Diffuse intensity, clamped to 0-1
+		currentLight.Color * currentLight.Intensity * // Light’s overall color
+		inputColor;
+    
+        float3 lightRefl = reflect(currentLight.Direction, inputNormal);
+        float3 directionToCam = normalize(cameraPos - worldPos);
+    
+        float RdotV = saturate(dot(lightRefl, -directionToCam));
+    
+        float3 specularTerm =
+        pow(RdotV, shininess) *
+        currentLight.Color * currentLight.Intensity *
+        inputColor;
+    
+        float4 phongTerm;
+        phongTerm.x = diffuseTerm.x + specularTerm.x;
+        phongTerm.y = diffuseTerm.y + specularTerm.y;
+        phongTerm.z = diffuseTerm.z + specularTerm.z;
+        phongTerm.w = 1.0f;
+    
+    if (currentLight.Type == LIGHT_TYPE_POINT) //point light attenuation
+    {
+        phongTerm *= Attenuate(currentLight, worldPos);
+    }
+    
+        return phongTerm;
+    }
+
 
 #endif

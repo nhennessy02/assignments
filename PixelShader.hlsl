@@ -7,7 +7,11 @@ cbuffer ExternalData : register(b0)
 	float roughness;
 	float3 cameraPos;
 	float3 ambient;
-	Light directionalLight1;
+	Light Light1;
+	Light Light2;
+	Light Light3;
+	Light PointLight1;
+	Light PointLight2;
 }
 
 // --------------------------------------------------------
@@ -22,15 +26,20 @@ cbuffer ExternalData : register(b0)
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.normal = normalize(input.normal);
-
+	
+	//uses input.color as the storage for the color + ambient light
 	input.color.x = colorTint.x * ambient.x;
 	input.color.y = colorTint.y * ambient.y;
 	input.color.z = colorTint.z * ambient.z;
 	input.color.w = colorTint.w;
 
 	float specExponent = (1.0f - roughness) * MAX_SPECULAR_EXPONENT;
-	return calcLightDiffuse(directionalLight1, input.worldPosition, input.normal, input.color);
-	//return calcLightSpecular(directionalLight1, input.worldPosition, input.normal, input.color, specExponent, cameraPos);
+	return input.color 
+		+ calcLightPhong(Light1, input.worldPosition, input.normal, input.color, specExponent, cameraPos) 
+		+ calcLightPhong(Light2, input.worldPosition, input.normal, input.color, specExponent, cameraPos)
+		+ calcLightPhong(Light3, input.worldPosition, input.normal, input.color, specExponent, cameraPos)
+		+ calcLightPhong(PointLight1, input.worldPosition, input.normal, input.color, specExponent, cameraPos)
+		+ calcLightPhong(PointLight2, input.worldPosition, input.normal, input.color, specExponent, cameraPos);
 }
 
 

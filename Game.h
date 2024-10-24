@@ -106,7 +106,11 @@ private:
 
 	//lights
 	DirectX::XMFLOAT3 ambientColor = { 0.1, 0.1, 0.25 };
-	Light directionalLight1 = {};
+	Light Light1 = {};
+	Light Light2 = {};
+	Light Light3 = {};
+	Light PointLight1 = {};
+	Light PointLight2 = {};
 	
 };
 

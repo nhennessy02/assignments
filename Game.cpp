@@ -48,13 +48,39 @@ void Game::Initialize()
 	fancyMat = std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 0.5, vertexShader, fancyShader);
 
 	//lights
-	directionalLight1.Type = LIGHT_TYPE_DIRECTIONAL;
-	directionalLight1.Direction = XMFLOAT3(1.0, 0, 0);
-	directionalLight1.Position = XMFLOAT3(15.0, 4.0, 2.0);
-	directionalLight1.Color = XMFLOAT3(1.0, 0, 0);
-	directionalLight1.Intensity = 5.0;
-	//send this data to the pixel shader
-	pixelShader->SetData("directionalLight1",&directionalLight1,sizeof(Light)); 
+	Light1.Type = LIGHT_TYPE_DIRECTIONAL;
+	Light1.Direction = XMFLOAT3(1.0, 0, 0);
+	Light1.Color = XMFLOAT3(1.0, 0, 0);
+	Light1.Intensity = 5.0;
+	pixelShader->SetData("Light1", &Light1, sizeof(Light));
+
+	Light2.Type = LIGHT_TYPE_DIRECTIONAL;
+	Light2.Direction = XMFLOAT3(-1.0, 0, 0);
+	Light2.Color = XMFLOAT3(0, 1.0, 0);
+	Light2.Intensity = 5.0;
+	pixelShader->SetData("Light2", &Light2, sizeof(Light)); 
+	
+	Light3.Type = LIGHT_TYPE_DIRECTIONAL;
+	Light3.Direction = XMFLOAT3(0, 1.0, 0);
+	Light3.Color = XMFLOAT3(0, 0, 1.0);
+	Light3.Intensity = 3.0;
+	pixelShader->SetData("Light3", &Light3, sizeof(Light));
+
+	PointLight1.Type = LIGHT_TYPE_POINT;
+	PointLight1.Direction = XMFLOAT3(1.0, 0, 0);
+	PointLight1.Position = XMFLOAT3(-13.0, 4.0, -4.0);
+	PointLight1.Color = XMFLOAT3(1.0, 1.0, 1.0);
+	PointLight1.Intensity = 8.0;
+	PointLight1.Range = 7.5;
+	pixelShader->SetData("PointLight1", &PointLight1, sizeof(Light));
+
+	PointLight2.Type = LIGHT_TYPE_POINT;
+	PointLight2.Direction = XMFLOAT3(-1.0, 0, 0);
+	PointLight2.Position = XMFLOAT3(12.0, 4.0, -4.0);
+	PointLight2.Color = XMFLOAT3(1.0, 1.0, 1.0);
+	PointLight2.Intensity = 8.0;
+	PointLight2.Range = 7.5;
+	pixelShader->SetData("PointLight2", &PointLight2, sizeof(Light));
 
 	//make the 3d objects
 	CreateGeometry();
@@ -279,30 +305,6 @@ void Game::BuildUI(float deltaTime)
 	if(disableAll)
 		ImGui::EndDisabled();
 
-	//Mesh UI
-	/*if (ImGui::CollapsingHeader("Mesh Information"))
-	{
-		ImGui::ColorEdit4("Color Tint", colorTint);
-		if (ImGui::CollapsingHeader("Mesh: Triangle"))
-		{
-			ImGui::Text("Triangles: %i", triangle->GetIndexCount() / 3);
-			ImGui::Text("Vertices: %i", triangle->GetVertexCount());
-			ImGui::Text("Indices: %i", triangle->GetIndexCount());
-		}
-		if (ImGui::CollapsingHeader("Mesh: Diamond"))
-		{
-			ImGui::Text("Triangles: %i", diamond->GetIndexCount() / 3);
-			ImGui::Text("Vertices: %i", diamond->GetVertexCount());
-			ImGui::Text("Indices: %i", diamond->GetIndexCount());
-		}
-		if (ImGui::CollapsingHeader("Mesh: Hexagon"))
-		{
-			ImGui::Text("Triangles: %i", hexagon->GetIndexCount() / 3);
-			ImGui::Text("Vertices: %i", hexagon->GetVertexCount());
-			ImGui::Text("Indices: %i", hexagon->GetIndexCount());
-		}
-	}*/
-
 	XMFLOAT3 posi;
 	XMFLOAT3 rota;
 	XMFLOAT3 scal;
@@ -336,6 +338,56 @@ void Game::BuildUI(float deltaTime)
 			ImGui::PopID();
 		}
 		
+	}
+
+	float* lightcolor1 = &Light1.Color.x;
+	float* lightcolor2 = &Light2.Color.x;
+	float* lightcolor3 = &Light3.Color.x;
+	float* lightcolor4 = &PointLight1.Color.x;
+	float* lightcolor5 = &PointLight2.Color.x;
+
+	if (ImGui::CollapsingHeader("Lights"))
+	{
+		if (ImGui::TreeNode("Light 1"))
+		{
+			if (ImGui::ColorEdit4("Light 1 Color", lightcolor1))
+			{
+				pixelShader->SetData("Light1", &Light1, sizeof(Light));
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Light 2"))
+		{
+			if (ImGui::ColorEdit4("Light 2 Color", lightcolor2))
+			{
+				pixelShader->SetData("Light2", &Light2, sizeof(Light));
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Light 3"))
+		{
+			if (ImGui::ColorEdit4("Light 3 Color", lightcolor3))
+			{
+				pixelShader->SetData("Light3", &Light3, sizeof(Light));
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Light 4"))
+		{
+			if (ImGui::ColorEdit4("Light 4 Color", lightcolor4))
+			{
+				pixelShader->SetData("PointLight1", &PointLight1, sizeof(Light));
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Light 5"))
+		{
+			if (ImGui::ColorEdit4("Light 5 Color", lightcolor5))
+			{
+				pixelShader->SetData("PointLight2", &PointLight2, sizeof(Light));
+			}
+			ImGui::TreePop();
+		}
 	}
 
 	if(ImGui::CollapsingHeader("Cameras"))
