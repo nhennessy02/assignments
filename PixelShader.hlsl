@@ -29,7 +29,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 	input.color.w = colorTint.w;
 
 	float specExponent = (1.0f - roughness) * MAX_SPECULAR_EXPONENT;
-	return calcLightSpecular(directionalLight1, input.worldPosition, input.normal, input.color, specExponent);
+	return calcLightDiffuse(directionalLight1, input.worldPosition, input.normal, input.color);
+	//return calcLightSpecular(directionalLight1, input.worldPosition, input.normal, input.color, specExponent, cameraPos);
 }
 
 

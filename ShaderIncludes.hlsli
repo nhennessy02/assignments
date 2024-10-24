@@ -54,10 +54,11 @@ struct VertexToPixel
 float4 calcLightDiffuse(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor)
 {
 	float3 direction = normalize(currentLight.Position - worldPos);
+    //when directional just use NEGATIVE direction
 
 	//from reading
 	float3 diffuseTerm =
-		saturate(dot(inputNormal, -direction)) * // Diffuse intensity, clamped to 0-1
+		saturate(dot(inputNormal, direction)) * // Diffuse intensity, clamped to 0-1
 		currentLight.Color * currentLight.Intensity * // Light’s overall color
 		inputColor;
 
@@ -70,10 +71,10 @@ float4 calcLightDiffuse(Light currentLight, float3 worldPos, float3 inputNormal,
 	return finalColor;
 }
 
-float4 calcLightSpecular(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor, float shininess)
+float4 calcLightSpecular(Light currentLight, float3 worldPos, float3 inputNormal, float3 inputColor, float shininess, float3 cameraPos)
 {
     float3 lightRefl = reflect(currentLight.Direction, inputNormal);
-    float3 directionToCam = normalize(currentLight.Position - worldPos);
+    float3 directionToCam = normalize(cameraPos - worldPos);
     
     float RdotV = saturate(dot(lightRefl, directionToCam));
     
